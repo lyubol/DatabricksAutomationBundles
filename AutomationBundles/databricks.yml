@@ -1,0 +1,50 @@
+# This is a Declarative Automation Bundle definition for AutomationBundles.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: AutomationBundles
+  uuid: 62f77dc8-9c7e-4e23-b17e-1294c4224c17
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+# artifacts:
+#   python_artifact:
+#     type: whl
+#     build: uv build --wheel
+
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    presets:
+      name_prefix: "[dev ${workspace.current_user.short_name}] "
+      source_linked_deployment: false
+    workspace:
+      host: dbc-12fe94fd-e135.cloud.databricks.com
+    variables:
+      catalog: automation_bundles
+      schema: ${workspace.current_user.short_name}
+  prod:
+    mode: production
+    workspace:
+      host: dbc-12fe94fd-e135.cloud.databricks.com
+      # We explicitly deploy to /Workspace/Users/lyubomir.lirkov@telefonicatech.uk to make sure we only have a single copy.
+      root_path: /Workspace/Users/lyubomir.lirkov@telefonicatech.uk/PROD/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: automation_bundles
+      schema: prod
+    permissions:
+      - group_name: admins
+        level: CAN_MANAGE

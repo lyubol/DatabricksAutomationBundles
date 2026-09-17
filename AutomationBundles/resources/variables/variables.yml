@@ -1,0 +1,12 @@
+variables:
+  catalog_name:
+    description: Catalog name
+    default: automation_bundles
+
+  schema_name:
+    description: Schema name
+    default: default
+
+  column_name:
+    description: Column name
+    default: DefaultColumnName
